@@ -17,9 +17,12 @@ private:
     int ni,nj,nk;
 public:
     GridPoints(int i, int j, int k);
+    ~GridPoints();
     void set(int i, int j, int k, vec p);
     vec get(int i, int j, int k);
-    vec& operator[](int i, int j, int k);
+    vec& operator()(int i, int j, int k);
+    vec operator()(int i, int j, int k) const;
+    int dataSize() const;
 };
 
 #endif // GRIDPOINTS_H
