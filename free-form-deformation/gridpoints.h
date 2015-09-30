@@ -19,6 +19,7 @@ public:
     GridPoints(int i, int j, int k);
     void set(int i, int j, int k, vec p);
     vec get(int i, int j, int k);
+    vec& operator[](int i, int j, int k);
 };
 
 #endif // GRIDPOINTS_H

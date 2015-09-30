@@ -18,4 +18,9 @@ vec GridPoints::get(int i, int j, int k)
     return this->_data.at(i * j*this->ni + k*this->ni*this->nj);
 }
 
+vec &GridPoints::operator[](int i, int j, int k)
+{
+    return this->_data.at(i * j*this->ni + k*this->ni*this->nj);
+}
+
 
