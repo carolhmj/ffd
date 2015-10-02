@@ -16,12 +16,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     glwidget.cpp \
     ffdgrid.cpp \
-    gridpoints.cpp
+    gridpoints.cpp \
+    model.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
     ffdgrid.h \
-    gridpoints.h
+    gridpoints.h \
+    model.h
 
 FORMS    += mainwindow.ui
 

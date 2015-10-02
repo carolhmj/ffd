@@ -26,6 +26,7 @@ public:
     ~FFDGrid();
 
     void draw(int mode);
+    void reset();
 };
 
 #endif // FFDGRID_H
