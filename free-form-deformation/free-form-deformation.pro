@@ -27,7 +27,7 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-LIBS     += -L $$PWD/trimesh2/lib.Linux64/ -ltrimesh
+LIBS     += -L $$PWD/trimesh2/lib.Linux64/ -ltrimesh -lobj
 
 INCLUDEPATH += $$PWD/trimesh2/include/
 

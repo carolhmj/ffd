@@ -4,6 +4,7 @@
 #include "TriMesh.h"
 #include "Vec.h"
 #include "ffdgrid.h"
+#include <GL/gl.h>
 #include <string>
 
 using namespace trimesh;
@@ -16,9 +17,11 @@ private:
     TriMesh* model;
     FFDGrid* grid;
 public:
-    Model(std::string modelName, int ns, int nt, int nu);
-    void draw();
+    Model(const char *modelName, int ns, int nt, int nu);
+    void drawModel();
     void deformGrid();
+    FFDGrid *getGrid() const;
+    void setGrid(FFDGrid *value);
 };
 
 #endif // MODEL_H

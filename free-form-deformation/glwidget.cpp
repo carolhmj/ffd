@@ -24,15 +24,20 @@ void GLWidget::initializeGL()
 
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_CULL_FACE);
-    vec p(0,0,0);
-    vec S(1,0,0);
-    vec T(0,1,0);
-    vec U(0,0,1);
-    grid = new FFDGrid(p,S,T,U,2,2,2);
+//    vec p(0,0,0);
+//    vec S(1,0,0);
+//    vec T(0,1,0);
+//    vec U(0,0,1);
+//    grid = new FFDGrid(p,S,T,U,2,2,2);
+
+    //model = new Model("bun_zipper.ply", 10, 10, 10);
+    obj::obj_parser parser;
+    parser.parse("FinalBaseMesh.obj");
     lastMouse[0] = 0;
     lastMouse[1] = 0;
     angles[0] = 0;
     angles[1] = 0;
+
     time.start(60);
 }
 
@@ -49,7 +54,9 @@ void GLWidget::resizeGL(int w, int h)
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    this->grid->draw(1);
+
+    //model->drawModel();
+    //model->getGrid()->draw(1);
 }
 
 void GLWidget::update()
