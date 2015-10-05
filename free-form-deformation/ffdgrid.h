@@ -1,11 +1,11 @@
 #ifndef FFDGRID_H
 #define FFDGRID_H
 
-//#include "KDtree.h"
-#include "Vec.h"
+#include <QVector3D>
 #include "gridpoints.h"
+#include "transformmatrix.h"
+#include "model.h"
 
-using namespace trimesh;
 /*
  * Classe que representa o grid de pontos usados na FFD.
  * Guarda o ponto P0, os vetores (S,T,U) que definem o FFD,
@@ -16,17 +16,24 @@ using namespace trimesh;
 class FFDGrid
 {
 private:
-    vec p;
-    vec S, T, U;
+    QVector4D p;
+    QVector4D S, T, U;
     int ns, nt, nu;
     GridPoints points;
     enum DrawMode {POINTS_ONLY, WIRE};
 public:
-    FFDGrid(trimesh::vec p, trimesh::vec S, trimesh::vec T, trimesh::vec U, int ns, int nt, int nu);
+    FFDGrid(QVector4D p, QVector4D S, QVector4D T, QVector4D U, int ns, int nt, int nu);
     ~FFDGrid();
 
+    QVector4D getMedianPoint();
     void draw(int mode);
+    void applyTransform(tnw::TransformMatrix m);
     void reset();
+    void deformModel(tnw::Model &model);
+    int getNs() const;
+    int getNt() const;
+    int getNu() const;
+    GridPoints getPoints() const;
 };
 
 #endif // FFDGRID_H

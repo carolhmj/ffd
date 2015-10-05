@@ -17,19 +17,23 @@ SOURCES += main.cpp\
     glwidget.cpp \
     ffdgrid.cpp \
     gridpoints.cpp \
-    model.cpp
+    model.cpp \
+    light.cpp \
+    colormatrix.cpp \
+    transformmatrix.cpp \
+    gridmodel.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
     ffdgrid.h \
     gridpoints.h \
-    model.h
+    model.h \
+    light.h \
+    colormatrix.h \
+    transformmatrix.h \
+    gridmodel.h
 
 FORMS    += mainwindow.ui
-
-LIBS     += -L $$PWD/trimesh2/lib.Linux64/ -ltrimesh -lobj
-
-INCLUDEPATH += $$PWD/trimesh2/include/
 
 QMAKE_CXXFLAGS += -fopenmp -ggdb -std=c++11
 QMAKE_LFLAGS +=  -fopenmp -ggdb

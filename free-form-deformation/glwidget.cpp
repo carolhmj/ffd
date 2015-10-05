@@ -1,9 +1,8 @@
 #include "glwidget.h"
-#include "Vec.h"
 #include <QTimer>
 #include <iostream>
 
-using namespace trimesh;
+//using namespace trimesh;
 using namespace std;
 
 GLWidget::GLWidget(QWidget *parent) :
@@ -24,15 +23,20 @@ void GLWidget::initializeGL()
 
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_CULL_FACE);
-//    vec p(0,0,0);
-//    vec S(1,0,0);
-//    vec T(0,1,0);
-//    vec U(0,0,1);
-//    grid = new FFDGrid(p,S,T,U,2,2,2);
+    QVector4D p(0,0,0,1);
+    QVector4D S(1,0,0,0);
+    QVector4D T(0,1,0,0);
+    QVector4D U(0,0,1,0);
+    grid = new FFDGrid(p,S,T,U,2,2,2);
 
     //model = new Model("bun_zipper.ply", 10, 10, 10);
-    obj::obj_parser parser;
-    parser.parse("FinalBaseMesh.obj");
+    model = new tnw::Model("AstronautaCor.obj");
+    model->aplicarTransformacao(tnw::translacao(-model->getPontoMedio()));
+    model->aplicarTransformacao(tnw::escala(0.5,0.5,0.5));
+    tnw::Light l = tnw::Light(1.0,0.0,0.0);
+    l.setKs(0,0,0);
+    l.setKd(1,1,1);
+    luzes.append(l);
     lastMouse[0] = 0;
     lastMouse[1] = 0;
     angles[0] = 0;
@@ -55,8 +59,9 @@ void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //model->drawModel();
-    //model->getGrid()->draw(1);
+    float amb[3] = {0.2,0.2,0.2};
+    model->desenhar(amb,luzes);
+    grid->draw(1);
 }
 
 void GLWidget::update()
@@ -80,17 +85,31 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event){
         if (angles[0] >= 360) {
             angles[0] -= 360;
         }
-        glRotatef(delta, 0,1,0);
-        //lastMouse[0] = event->pos().x();
-    }
-    if (lbpress){
+
+        tnw::TransformMatrix r = tnw::rotacaoX(angles[0]);
+        tnw::TransformMatrix tmi = tnw::translacao(-model->getPontoMedio());
+        tnw::TransformMatrix tmf = tnw::translacao(model->getPontoMedio());
+        tnw::TransformMatrix tgi = tnw::translacao(-grid->getMedianPoint());
+        tnw::TransformMatrix tgf = tnw::translacao(grid->getMedianPoint());
+
+        model->aplicarTransformacao(tmf*r*tmi);
+        grid->applyTransform(tgf*r*tgi);
+        lastMouse[0] = event->pos().x();
+
         float delta = (event->pos().y() - lastMouse[1]) / this->height();
         angles[1] += delta;
         if (angles[1] >= 360){
             angles[1] -= 360;
         }
-        glRotatef(delta, 1,0,0);
-        //lastMouse[1] = event->pos().y();
+        tnw::TransformMatrix r = tnw::rotacaoY(angles[1]);
+        tnw::TransformMatrix tmi = tnw::translacao(-model->getPontoMedio());
+        tnw::TransformMatrix tmf = tnw::translacao(model->getPontoMedio());
+        tnw::TransformMatrix tgi = tnw::translacao(-grid->getMedianPoint());
+        tnw::TransformMatrix tgf = tnw::translacao(grid->getMedianPoint());
+
+        model->aplicarTransformacao(tmf*r*tmi);
+        grid->applyTransform(tgf*r*tgi);
+        lastMouse[1] = event->pos().y();
     }
 }
 

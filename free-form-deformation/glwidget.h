@@ -5,16 +5,10 @@
 #include <QGLWidget>
 #include <QTimer>
 #include <QMouseEvent>
+#include <QList>
+#include <QVector4D>
 #include "ffdgrid.h"
 #include "model.h"
-#include "TriMesh.h"
-#include "Vec.h"
-#include "GLCamera.h"
-#include <obj.hpp>
-#include <tr1/functional>
-#include <tr1/tuple>
-
-using namespace trimesh;
 
 class GLWidget : public QGLWidget
 {
@@ -24,12 +18,13 @@ public:
     ~GLWidget();
 protected:
     QTimer time;
-    Model* model;
-    GLCamera camera;
     float lastMouse[2];
     float angles[2];
     bool lbpress;
     bool rbpress;
+    tnw::Model *model;
+    FFDGrid *grid;
+    QList<tnw::Light> luzes;
 
     void initializeGL();
     void resizeGL(int w, int h);
