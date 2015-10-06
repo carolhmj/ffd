@@ -86,7 +86,7 @@
          <property name="title">
           <string>Number of points</string>
          </property>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>0</x>
@@ -110,6 +110,9 @@
                <property name="accessibleName">
                 <string/>
                </property>
+               <property name="value">
+                <number>5</number>
+               </property>
               </widget>
              </item>
             </layout>
@@ -124,7 +127,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="ntSelector"/>
+              <widget class="QSpinBox" name="ntSelector">
+               <property name="value">
+                <number>5</number>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
@@ -138,7 +145,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="nuSelector"/>
+              <widget class="QSpinBox" name="nuSelector">
+               <property name="value">
+                <number>5</number>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
@@ -152,6 +163,9 @@
           <string>Show grid</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="pointSelector"/>
        </item>
        <item>
         <widget class="QPushButton" name="resetViewButton">
@@ -180,8 +194,98 @@
    <extends>QWidget</extends>
    <header>glwidget.h</header>
    <container>1</container>
+   <slots>
+    <slot>showGrid(bool)</slot>
+    <slot>restartGrid()</slot>
+    <slot>openModel()</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>showGridOption</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>glWidget</receiver>
+   <slot>showGrid(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>490</x>
+     <y>234</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>417</x>
+     <y>229</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>nsSelector</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeNumGridPoints(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>513</x>
+     <y>172</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>549</x>
+     <y>-9</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ntSelector</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeNumGridPoints(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>576</x>
+     <y>174</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>685</x>
+     <y>182</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>nuSelector</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeNumGridPoints(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>641</x>
+     <y>170</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>687</x>
+     <y>67</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>loadButton</sender>
+   <signal>clicked()</signal>
+   <receiver>glWidget</receiver>
+   <slot>openModel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>610</x>
+     <y>51</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>74</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>changeNumGridPoints(int)</slot>
+  <slot>populatePointSelector(std::vector)</slot>
+ </slots>
 </ui>

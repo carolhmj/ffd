@@ -22,10 +22,12 @@ public:
     GridModel(QString modelName, int ns, int nt, int nu);
     void calcLocalModelVertices();
     float formulaHelper(QVector3D v1, QVector3D v2, QVector3D v3, QVector3D p, QVector3D p0);
-    void substituteGrid();
+    void substituteGrid(FFDGrid *grid);
     void deformModel();
     QVector4D bezierHelper(float s, float t, float u);
     long long combiHelper(int n, int k);
+    tnw::Model *getModel() const;
+    FFDGrid *getGrid() const;
 };
 
 #endif // GRIDMODEL_H

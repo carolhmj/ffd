@@ -1,21 +1,33 @@
 #include "gridmodel.h"
 #include <cfloat>
 #include <cmath>
+#include <iostream>
 
+using namespace std;
 /* Construtor da classe. Recebe o nome do modelo, e
  * a quantidade de pontos em cada direção. Nesse caso,
  * ele automaticamente irá definir os vetores S,T,U como
  * partindo do menor para o maior ponto do modelo
  */
+
+tnw::Model *GridModel::getModel() const
+{
+    return model;
+}
+
+FFDGrid *GridModel::getGrid() const
+{
+    return grid;
+}
 GridModel::GridModel(QString modelName, int ns, int nt, int nu)
 {
     this->model = new tnw::Model(modelName);
     //Precisamos descobrir os menores e maiores pontos do modelo
     float maxcoords[3] = {FLT_MIN, FLT_MIN, FLT_MIN}, mincoords[3] = {FLT_MAX, FLT_MAX, FLT_MAX};
-    for (auto it = model->getVertices().begin(); it < model->getVertices().end(); it++){
-        float x = (*it).x();
-        float y = (*it).y();
-        float z = (*it).z();
+    for (int i = 0; i < model->getVertices().size(); i++){
+        float x = model->getVertices()[i].x();
+        float y = model->getVertices()[i].y();
+        float z = model->getVertices()[i].z();
         if (x > maxcoords[0]){
             maxcoords[0] = x;
         } else if (x < mincoords[0]){
@@ -37,7 +49,7 @@ GridModel::GridModel(QString modelName, int ns, int nt, int nu)
     QVector4D S(maxcoords[0],mincoords[1],mincoords[2],0);
     QVector4D T(mincoords[0],maxcoords[1],mincoords[2],0);
     QVector4D U(mincoords[0],mincoords[1],maxcoords[2],0);
-
+    //cout << "p: " << p << "s: " << S << "t: " << T << "u: " << U;
     this->grid = new FFDGrid(p,S,T,U,ns,nt,nu);
     calcLocalModelVertices();
 
@@ -54,18 +66,18 @@ void GridModel::calcLocalModelVertices()
      * das coordenadas locais na lista será a mesma ordem dos vértices
      * na lista.
      */
-    QVector3D pn = p.toVector3D();
-    QVector3D Sn = S.toVector3D();
-    QVector3D Tn = T.toVector3D();
-    QVector3D Un = U.toVector3D();
+    QVector3D pn = this->grid->getP().toVector3D();
+    QVector3D Sn = this->grid->getS().toVector3D();
+    QVector3D Tn = this->grid->getT().toVector3D();
+    QVector3D Un = this->grid->getU().toVector3D();
     auto vertices = this->model->getVertices();
-    for (unsigned int i = 0; i < vertices.size(); i++){
+    for (int i = 0; i < vertices.size(); i++){
         QVector4D coord;
-        coord.setX( formulaHelper(Tn,Un,Sn,vertices[i],pn) );
-        coord.setY( formulaHelper(Un,Sn,Tn,vertices[i],pn) );
-        coord.setZ( formulaHelper(Sn,Tn,Un,vertices[i],pn) );
+        coord.setX( formulaHelper(Tn,Un,Sn,vertices[i].toVector3D(),pn) );
+        coord.setY( formulaHelper(Un,Sn,Tn,vertices[i].toVector3D(),pn) );
+        coord.setZ( formulaHelper(Sn,Tn,Un,vertices[i].toVector3D(),pn) );
         coord.setW( 1 );
-        this->modelVerticesLocal[i] = coord;
+        this->modelVerticesLocal.push_back(coord);
     }
 }
 
@@ -75,7 +87,15 @@ void GridModel::calcLocalModelVertices()
 float GridModel::formulaHelper(QVector3D v1, QVector3D v2, QVector3D v3, QVector3D p, QVector3D p0)
 {
     //QVector3D::dotProduct( QVector3D::crossProduct(v1,v2), (p - p0) / QVector3D::dotProduct(QVector3D::crossProduct(v1,v2),v3));
-    QVector3D::dotProduct(QVector3D::crossProduct(v1,v2), p - p0) / QVector3D::dotProduct(QVector3D::crossProduct(v1,v2), v3);
+    return QVector3D::dotProduct(QVector3D::crossProduct(v1,v2), p - p0) / QVector3D::dotProduct(QVector3D::crossProduct(v1,v2), v3);
+}
+
+//Substitui o grid por outro, recalcula as coordenadas locais
+void GridModel::substituteGrid(FFDGrid *grid)
+{
+    delete this->grid;
+    this->grid = grid;
+    calcLocalModelVertices();
 }
 
 /* Recebe um modelo e deforma seus vértices de acordo com a fórmula
@@ -89,17 +109,18 @@ void GridModel::deformModel()
     }
     auto modelVertices = model->getVertices();
     for (int m = 0; m < modelVertices.size(); m++){
-        QVector4D localCoords = modelVerticesLocal[i];
-        modelVertices[i] = bezierHelper(localCoords.x(), localCoords.y(), localCoords.z());
+        QVector4D localCoords = modelVerticesLocal[m];
+        modelVertices[m] = bezierHelper(localCoords.x(), localCoords.y(), localCoords.z());
     }
 }
 
 QVector4D GridModel::bezierHelper(float s, float t, float u)
 {
     QVector4D acum;
-    for (int i = 0; i <= grid->getNs(); i++){
-        for (int j = 0; j <= grid->getNt(); j++){
-            for (int k = 0; k <= grid->getNu(); k++){
+    int l = grid->getNs(), m = grid->getNt(), n = grid->getNu();
+    for (int i = 0; i <= l; i++){
+        for (int j = 0; j <= m; j++){
+            for (int k = 0; k <= n; k++){
                 acum += combiHelper(l,i) * combiHelper(m,j) * combiHelper(n,k) * std::pow(1-s, l-i) * std::pow(s,i) * std::pow(1-t, m-j) * std::pow(t, j) * std::pow(1-u, n-k) * std::pow(u,k) * grid->getPoints().get(i,j,k);
             }
         }

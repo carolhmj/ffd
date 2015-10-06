@@ -26,6 +26,26 @@ GridPoints FFDGrid::getPoints() const
 {
     return points;
 }
+
+QVector4D FFDGrid::getP() const
+{
+    return p;
+}
+
+QVector4D FFDGrid::getS() const
+{
+    return S;
+}
+
+QVector4D FFDGrid::getT() const
+{
+    return T;
+}
+
+QVector4D FFDGrid::getU() const
+{
+    return U;
+}
 FFDGrid::FFDGrid(QVector4D p, QVector4D S, QVector4D T, QVector4D U, int ns, int nt, int nu) :
     /* Como nós desejamos na verdade ter os pontos de 0 a ns, a nt e a nu,
      * o número de pontos armazenados é 1 a mais.
@@ -52,6 +72,11 @@ FFDGrid::FFDGrid(QVector4D p, QVector4D S, QVector4D T, QVector4D U, int ns, int
             }
         }
     }
+}
+
+FFDGrid::~FFDGrid()
+{
+
 }
 
 //Ponto médio do grid é o ponto na metade de todos os vetores

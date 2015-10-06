@@ -1,5 +1,10 @@
 #include "gridpoints.h"
 
+
+std::vector<QVector4D> GridPoints::getData() const
+{
+    return _data;
+}
 GridPoints::GridPoints(int i, int j, int k)
 {
     this->_data.reserve(i*j*k);

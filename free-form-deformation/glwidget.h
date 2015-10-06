@@ -7,8 +7,9 @@
 #include <QMouseEvent>
 #include <QList>
 #include <QVector4D>
-#include "ffdgrid.h"
-#include "model.h"
+#include <QString>
+#include <vector>
+#include "gridmodel.h"
 
 class GLWidget : public QGLWidget
 {
@@ -22,8 +23,9 @@ protected:
     float angles[2];
     bool lbpress;
     bool rbpress;
-    tnw::Model *model;
-    FFDGrid *grid;
+    bool showGridOpt;
+    GridModel *model;
+    bool createdModel;
     QList<tnw::Light> luzes;
 
     void initializeGL();
@@ -33,8 +35,12 @@ protected:
     void mouseReleaseEvent(QMouseEvent*);
     void mouseMoveEvent(QMouseEvent*);
 signals:
+    void displayPoints(std::vector<QVector4D> points);
 public slots:
     void update();
+    void openModel();
+    void changeNumGridPoints(int ns, int nt, int nu);
+    void showGrid(bool show);
 };
 
 #endif // GLWIDGET_H

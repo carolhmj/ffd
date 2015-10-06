@@ -34,6 +34,10 @@ public:
     int getNt() const;
     int getNu() const;
     GridPoints getPoints() const;
+    QVector4D getP() const;
+    QVector4D getS() const;
+    QVector4D getT() const;
+    QVector4D getU() const;
 };
 
 #endif // FFDGRID_H
