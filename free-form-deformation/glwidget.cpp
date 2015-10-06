@@ -77,12 +77,17 @@ void GLWidget::update()
 
 void GLWidget::openModel()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Model"), "", tr("*.obj files"));
-    this->model = new GridModel(fileName, 5, 5, 5);
-    tnw::TransformMatrix m = tnw::escala(0.5,0.5,0.5);
-    this->model->getModel()->aplicarTransformacao(m);
-    this->model->getGrid()->applyTransform(m);
-    displayPoints(this->model->getGrid()->getPoints().getData());
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Model"), "", tr("*.obj files with a *.mtl file"));
+    QVector4D p(0,0,0,1);
+    QVector4D S(1.5,0,0,0);
+    QVector4D T(0,1.5,0,0);
+    QVector4D U(0,0,1.5,0);
+    this->model = new GridModel(fileName, p, S, T, U, 5, 5, 5);
+    //this->model = new GridModel(fileName, 5, 5, 5);
+    //tnw::TransformMatrix m = tnw::escala(0.3,0.3,0.3);
+    //tnw::TransformMatrix t = tnw::translacao(-this->model->getModel()->getPontoMedio());
+    //this->model->getModel()->aplicarTransformacao(m*t);
+    //this->model->getGrid()->applyTransform(m);
     createdModel = true;
 }
 
@@ -93,9 +98,50 @@ void GLWidget::changeNumGridPoints(int ns, int nt, int nu)
     this->model->substituteGrid(newGrid);
 }
 
+void GLWidget::resetView()
+{
+    float angleToRotateX;
+    if (angles[0] > 0) {
+        angleToRotateX = -angles[0];
+    } else {
+        angleToRotateX = angles[0];
+    }
+
+    tnw::TransformMatrix rX = tnw::rotacaoX(angleToRotateX);
+    tnw::TransformMatrix tmiX = tnw::translacao(-model->getModel()->getPontoMedio());
+    tnw::TransformMatrix tmfX = tnw::translacao(model->getModel()->getPontoMedio());
+    tnw::TransformMatrix tgiX = tnw::translacao(-model->getGrid()->getMedianPoint());
+    tnw::TransformMatrix tgfX = tnw::translacao(model->getGrid()->getMedianPoint());
+
+    model->getModel()->aplicarTransformacao(tmfX*rX*tmiX);
+    model->getGrid()->applyTransform(tgfX*rX*tgiX);
+
+    float angleToRotateY;
+    if (angles[0] > 0) {
+        angleToRotateY = -angles[1];
+    } else {
+        angleToRotateY = angles[1];
+    }
+
+    tnw::TransformMatrix rY = tnw::rotacaoY(angleToRotateY);
+    tnw::TransformMatrix tmiY = tnw::translacao(-model->getModel()->getPontoMedio());
+    tnw::TransformMatrix tmfY = tnw::translacao(model->getModel()->getPontoMedio());
+    tnw::TransformMatrix tgiY = tnw::translacao(-model->getGrid()->getMedianPoint());
+    tnw::TransformMatrix tgfY = tnw::translacao(model->getGrid()->getMedianPoint());
+
+    model->getModel()->aplicarTransformacao(tmfY*rY*tmiY);
+    model->getGrid()->applyTransform(tgfY*rY*tgiY);
+}
+
 void GLWidget::showGrid(bool show)
 {
     this->showGridOpt = show;
+}
+
+void GLWidget::selectGridPoint(QVector3D selectedPoint)
+{
+    cout << "selected point: " << selectedPoint[0] << " " << selectedPoint[1] << " " << selectedPoint[2] << "\n";
+    this->model->getGrid()->setSelectedPoint(selectedPoint);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event){
@@ -111,9 +157,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event){
     if (rbpress) {
         float deltaX = (event->pos().x() - lastMouse[0]) / this->width() ;
         angles[0] += deltaX;
-        if (angles[0] >= 360) {
-            angles[0] -= 360;
-        }
+        //cout << "deltaX: " << deltaX << " e angles: " << angles[0] << "\n";
+//        if (angles[0] >= 360) {
+//            angles[0] -= 360;
+//        }
 
         tnw::TransformMatrix rX = tnw::rotacaoX(angles[0]);
         tnw::TransformMatrix tmiX = tnw::translacao(-model->getModel()->getPontoMedio());
@@ -125,11 +172,12 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event){
         model->getGrid()->applyTransform(tgfX*rX*tgiX);
         lastMouse[0] = event->pos().x();
 
-        float deltaY = (event->pos().y() - lastMouse[1]) / this->height();
+        float deltaY = (lastMouse[1] - event->pos().y()) / this->height();
         angles[1] += deltaY;
-        if (angles[1] >= 360){
-            angles[1] -= 360;
-        }
+        //cout << "deltaY: " << deltaY << " e angles: " << angles[1] << "\n";
+//        if (angles[1] >= 360){
+//            angles[1] -= 360;
+//        }
         tnw::TransformMatrix rY = tnw::rotacaoY(angles[1]);
         tnw::TransformMatrix tmiY = tnw::translacao(-model->getModel()->getPontoMedio());
         tnw::TransformMatrix tmfY = tnw::translacao(model->getModel()->getPontoMedio());
@@ -139,6 +187,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event){
         model->getModel()->aplicarTransformacao(tmfY*rY*tmiY);
         model->getGrid()->applyTransform(tgfY*rY*tgiY);
         lastMouse[1] = event->pos().y();
+    }
+    if (lbpress){
+        //Aqui vai o código de mover o ponto
     }
 }
 

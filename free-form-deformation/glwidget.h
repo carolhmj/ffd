@@ -40,7 +40,9 @@ public slots:
     void update();
     void openModel();
     void changeNumGridPoints(int ns, int nt, int nu);
+    void resetView();
     void showGrid(bool show);
+    void selectGridPoint(QVector3D selectedPoint);
 };
 
 #endif // GLWIDGET_H

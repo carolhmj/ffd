@@ -162,10 +162,13 @@
          <property name="text">
           <string>Show grid</string>
          </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="pointSelector"/>
+        <widget class="QLineEdit" name="pointSelector"/>
        </item>
        <item>
         <widget class="QPushButton" name="resetViewButton">
@@ -192,12 +195,13 @@
   <customwidget>
    <class>GLWidget</class>
    <extends>QWidget</extends>
-   <header>glwidget.h</header>
+   <header location="global">glwidget.h</header>
    <container>1</container>
    <slots>
     <slot>showGrid(bool)</slot>
     <slot>restartGrid()</slot>
     <slot>openModel()</slot>
+    <slot>resetView()</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -283,9 +287,42 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>resetViewButton</sender>
+   <signal>clicked()</signal>
+   <receiver>glWidget</receiver>
+   <slot>resetView()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>508</x>
+     <y>331</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>444</x>
+     <y>328</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pointSelector</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>selectedPointTextInput(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>517</x>
+     <y>284</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>688</x>
+     <y>239</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>changeNumGridPoints(int)</slot>
   <slot>populatePointSelector(std::vector)</slot>
+  <slot>selectedPointTextInput(QString)</slot>
  </slots>
 </ui>

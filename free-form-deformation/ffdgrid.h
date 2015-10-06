@@ -20,6 +20,7 @@ private:
     QVector4D S, T, U;
     int ns, nt, nu;
     GridPoints points;
+    QVector3D selectedPoint;
     enum DrawMode {POINTS_ONLY, WIRE};
 public:
     FFDGrid(QVector4D p, QVector4D S, QVector4D T, QVector4D U, int ns, int nt, int nu);
@@ -38,6 +39,8 @@ public:
     QVector4D getS() const;
     QVector4D getT() const;
     QVector4D getU() const;
+    QVector3D getSelectedPoint() const;
+    void setSelectedPoint(const QVector3D &value);
 };
 
 #endif // FFDGRID_H

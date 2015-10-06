@@ -46,6 +46,16 @@ QVector4D FFDGrid::getU() const
 {
     return U;
 }
+
+QVector3D FFDGrid::getSelectedPoint() const
+{
+    return selectedPoint;
+}
+
+void FFDGrid::setSelectedPoint(const QVector3D &value)
+{
+    selectedPoint = value;
+}
 FFDGrid::FFDGrid(QVector4D p, QVector4D S, QVector4D T, QVector4D U, int ns, int nt, int nu) :
     /* Como nós desejamos na verdade ter os pontos de 0 a ns, a nt e a nu,
      * o número de pontos armazenados é 1 a mais.
@@ -60,6 +70,10 @@ FFDGrid::FFDGrid(QVector4D p, QVector4D S, QVector4D T, QVector4D U, int ns, int
     this->ns = ns;
     this->nt = nt;
     this->nu = nu;
+
+    this->selectedPoint.setX(-1);
+    this->selectedPoint.setY(-1);
+    this->selectedPoint.setZ(-1);
 
     //Inicialização dos pontos
     for (int i = 0; i <= ns; i++){
@@ -136,7 +150,15 @@ void FFDGrid::draw(int mode)
                 for (int j=0; j <= nt; j++){
                     for (int k=0; k <= nu; k++){
                         QVector4D v = this->points(i,j,k);
-                        glVertex3d(v[0],v[1],v[2]);
+                        if (QVector3D(i,j,k) == this->selectedPoint){
+                            glColor3f(0,1,0);
+                            glPointSize(8);
+                            glVertex3d(v[0],v[1],v[2]);
+                            glPointSize(4);
+                            glColor3f(1,1,1);
+                        } else {
+                            glVertex3d(v[0],v[1],v[2]);
+                        }
                     }
                 }
             }

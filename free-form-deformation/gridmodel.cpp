@@ -46,13 +46,25 @@ GridModel::GridModel(QString modelName, int ns, int nt, int nu)
     }
 
     QVector4D p(mincoords[0],mincoords[1],mincoords[2],1);
-    QVector4D S(maxcoords[0],mincoords[1],mincoords[2],0);
-    QVector4D T(mincoords[0],maxcoords[1],mincoords[2],0);
-    QVector4D U(mincoords[0],mincoords[1],maxcoords[2],0);
+    //QVector4D p(0,0,0,1);
+    QVector4D S(maxcoords[0]-mincoords[0],0,0,0);
+    QVector4D T(0,maxcoords[1]-mincoords[1],0,0);
+    QVector4D U(0,0,maxcoords[2]-mincoords[2],0);
     //cout << "p: " << p << "s: " << S << "t: " << T << "u: " << U;
+    cout << "p: " << p[0] << " " << p[1] << " " << p[2] << "\n";
+    cout << "S: " << S[0] << " " << S[1] << " " << S[2] << "\n";
+    cout << "T: " << T[0] << " " << T[1] << " " << T[2] << "\n";
+    cout << "U: " << U[0] << " " << U[1] << " " << U[2] << "\n";
     this->grid = new FFDGrid(p,S,T,U,ns,nt,nu);
     calcLocalModelVertices();
 
+}
+
+GridModel::GridModel(QString modelName, QVector4D p, QVector4D S, QVector4D T, QVector4D U, int ns, int nt, int nu)
+{
+    this->model = new tnw::Model(modelName);
+    this->grid = new FFDGrid(p,S,T,U,ns,nt,nu);
+    calcLocalModelVertices();
 }
 
 void GridModel::calcLocalModelVertices()

@@ -1,12 +1,15 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <string>
+#include <string.h>
+#include <iostream>
 
+using namespace std;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    connect(ui->glWidget, SIGNAL(displayPoints(std::vector<QVector4D>)), this, SLOT(populatePointSelector(std::vector<QVector4D>)));
 }
 
 MainWindow::~MainWindow()
@@ -20,12 +23,23 @@ void MainWindow::changeNumGridPoints(int nNum)
     ui->glWidget->changeNumGridPoints(ui->nsSelector->value(), ui->ntSelector->value(), ui->nuSelector->value());
 }
 
-void MainWindow::populatePointSelector(std::vector<QVector4D> pointList)
+void MainWindow::selectedPointTextInput(QString text)
 {
-    for (unsigned int i = 0; i < pointList.size(); i++){
-        QString tmp;
-        tmp.push_back("Point ");
-        tmp.setNum(i);
-        ui->pointSelector->addItem(tmp);
+    cout << text.toStdString() << "\n";
+    flush(cout);
+    char *textCon, *token;
+    textCon = (char*) malloc(sizeof(char)*(text.size()+1));
+    strcpy(textCon, text.toStdString().c_str());
+    QVector3D point;
+    int i = 0;
+
+    token = strtok(textCon, " ");
+    while (token != NULL && i < 3) {
+        cout << "atoi " << atoi(token) << "\n";
+        point[i] = atoi(token);
+        i++;
+        token = strtok(NULL, " ");
     }
+
+    ui->glWidget->selectGridPoint(point);
 }

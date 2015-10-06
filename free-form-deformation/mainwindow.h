@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <vector>
 #include <QVector4D>
+#include <QString>
 
 namespace Ui {
 class MainWindow;
@@ -25,7 +26,7 @@ signals:
 
 public slots:
     void changeNumGridPoints(int nNum);
-    void populatePointSelector(std::vector<QVector4D> pointList);
+    void selectedPointTextInput(QString text);
 };
 
 #endif // MAINWINDOW_H

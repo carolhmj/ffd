@@ -20,6 +20,7 @@ private:
     std::vector<QVector4D> modelVerticesLocal;
 public:
     GridModel(QString modelName, int ns, int nt, int nu);
+    GridModel(QString modelName, QVector4D p, QVector4D S, QVector4D T, QVector4D U, int ns, int nt, int nu);
     void calcLocalModelVertices();
     float formulaHelper(QVector3D v1, QVector3D v2, QVector3D v3, QVector3D p, QVector3D p0);
     void substituteGrid(FFDGrid *grid);
