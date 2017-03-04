@@ -56,6 +56,33 @@ void FFDGrid::setSelectedPoint(const QVector3D &value)
 {
     selectedPoint = value;
 }
+
+void FFDGrid::moveGridPoint(int i, int j, int k, QVector4D p)
+{
+    this->points(i,j,k) = p;
+}
+
+QString FFDGrid::printPointsInString()
+{
+    QString ret;
+
+    ret.push_back("num of points: ");
+    ret.setNum((this->ns+1)*(this->nt+1)*(this->nu+1));
+    ret.push_back("\n");
+    for (int i = 0; i <= this->ns; i++){
+        for (int j = 0; j <= this->nt; j++){
+            for (int k = 0; k < this->nu; k++){
+                ret.setNum(this->points(i,j,k).x());
+                ret.push_back(" ");
+                ret.setNum(this->points(i,j,k).y());
+                ret.push_back(" ");
+                ret.setNum(this->points(i,j,k).z());
+                ret.push_back("\n");
+            }
+        }
+    }
+    return ret;
+}
 FFDGrid::FFDGrid(QVector4D p, QVector4D S, QVector4D T, QVector4D U, int ns, int nt, int nu) :
     /* Como nós desejamos na verdade ter os pontos de 0 a ns, a nt e a nu,
      * o número de pontos armazenados é 1 a mais.
@@ -75,13 +102,13 @@ FFDGrid::FFDGrid(QVector4D p, QVector4D S, QVector4D T, QVector4D U, int ns, int
     this->selectedPoint.setY(-1);
     this->selectedPoint.setZ(-1);
 
+    cout << "======pontos do grid=======\n";
     //Inicialização dos pontos
     for (int i = 0; i <= ns; i++){
         for (int j = 0; j <= nt; j++){
             for (int k = 0; k <= nu; k++){
                 QVector4D v = p + float(i)/float(ns) * S + float(j)/float(nt) * T + float(k)/float(nu) * U;
-                //std::cout << "p" << i << ", " << j << ", " << k << ": " << v;
-                //flush(std::cout);
+                cout << v.x() << " " << v.y() << " " << v.z() << "\n";
                 this->points(i,j,k) = v;
             }
         }
@@ -192,17 +219,6 @@ void FFDGrid::reset()
                 this->points(i,j,k) = v;
             }
         }
-    }
-}
-
-/* Recebe um modelo e deforma seus vértices de acordo com a fórmula
- * de deformação do grid, no caso, a interpolação de Bézier mostrada
- * no livro Computer Animation, p. 151
- */
-void FFDGrid::deformModel(tnw::Model &model)
-{
-    for (auto it = model.getVertices().begin(); it < model.getVertices().end(); it++){
-
     }
 }
 

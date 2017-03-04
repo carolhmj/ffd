@@ -2,6 +2,8 @@
 #define FFDGRID_H
 
 #include <QVector3D>
+#include <QVector4D>
+#include <QString>
 #include "gridpoints.h"
 #include "transformmatrix.h"
 #include "model.h"
@@ -30,7 +32,6 @@ public:
     void draw(int mode);
     void applyTransform(tnw::TransformMatrix m);
     void reset();
-    void deformModel(tnw::Model &model);
     int getNs() const;
     int getNt() const;
     int getNu() const;
@@ -41,6 +42,8 @@ public:
     QVector4D getU() const;
     QVector3D getSelectedPoint() const;
     void setSelectedPoint(const QVector3D &value);
+    void moveGridPoint(int i, int j, int k, QVector4D p);
+    QString printPointsInString();
 };
 
 #endif // FFDGRID_H

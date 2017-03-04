@@ -12,6 +12,8 @@
 
 using std::get;
 
+
+
 void tnw::Model::desenhar(float ambiente[3],QList<tnw::Light> luzes)
 {
     glBegin(GL_TRIANGLES);
@@ -22,8 +24,11 @@ void tnw::Model::desenhar(float ambiente[3],QList<tnw::Light> luzes)
         QVector3D n(QVector3D::normal(a,b));
 
         // Passando os vértices pro OpenGL
-        if(get<6>(f) != nullptr)
+        if(get<6>(f) != nullptr) {
             glColor3fv(get<6>(f)->toColor(point,n,ambiente,luzes));
+        } else {
+            glColor3f(0,0,1);
+        }
         glVertex3d(v1.x(),v1.y(),v1.z());
         glVertex3d(v2.x(),v2.y(),v2.z());
         glVertex3d(v3.x(),v3.y(),v3.z());
@@ -40,8 +45,11 @@ void tnw::Model::desenhar(tnw::TransformMatrix m,float ambiente[3],QList<tnw::Li
         QVector3D b(v2-v1),a(v3-v1),point(v1*1/3 + v2*1/3 + v3*1/3);
 
         QVector3D n(QVector3D::normal(a,b));
-        if(get<6>(f) != nullptr)
+        if(get<6>(f) != nullptr) {
             glColor3fv(get<6>(f)->toColor(point,n,ambiente,luzes));
+        } else {
+            glColor3f(0,0,1);
+        }
         glBegin(GL_TRIANGLES);
         glVertex3d(v1.x(),v1.y(),v1.z());
         glVertex3d(v2.x(),v2.y(),v2.z());
@@ -52,6 +60,21 @@ void tnw::Model::desenhar(tnw::TransformMatrix m,float ambiente[3],QList<tnw::Li
         glEnd();*/
     }
 
+}
+
+void tnw::Model::desenhar()
+{
+    glColor3f(0, 0, 1);
+    glBegin(GL_TRIANGLES);
+    foreach (tnw::Face f, this->faces){
+        QVector4D v1 = *get<0>(f), v2 = *get<1>(f), v3 = *get<2>(f);
+
+        glVertex3d(v1.x(),v1.y(),v1.z());
+        glVertex3d(v2.x(),v2.y(),v2.z());
+        glVertex3d(v3.x(),v3.y(),v3.z());
+
+    }
+    glEnd();
 }
 
 void tnw::Model::aplicarTransformacao(TransformMatrix m)
@@ -79,6 +102,11 @@ void tnw::Model::aplicarTransformacao(tnw::TransformMatrix m, int i)
 QList<tnw::Vertice> tnw::Model::getVertices()
 {
     return this->vertices;
+}
+
+void tnw::Model::setVertices(const QList<Vertice> &value)
+{
+    this->vertices = value;
 }
 
 QList<tnw::Face> tnw::Model::getFaces()

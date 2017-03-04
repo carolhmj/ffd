@@ -2,6 +2,7 @@
 #include <QTimer>
 #include <iostream>
 #include <QFileDialog>
+#include <QVector3D>
 
 //using namespace trimesh;
 using namespace std;
@@ -23,26 +24,20 @@ void GLWidget::initializeGL()
     qglClearColor(Qt::black);
 
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
-//    QVector4D p(0,0,0,1);
-//    QVector4D S(1,0,0,0);
-//    QVector4D T(0,1,0,0);
-//    QVector4D U(0,0,1,0);
-//    grid = new FFDGrid(p,S,T,U,2,2,2);
-
-//    //model = new Model("bun_zipper.ply", 10, 10, 10);
-//    model = new tnw::Model("AstronautaCor.obj");
-//    model->aplicarTransformacao(tnw::translacao(-model->getPontoMedio()));
-//    model->aplicarTransformacao(tnw::escala(0.5,0.5,0.5));
+    glEnable(GL_CULL_FACE);
     createdModel = false;
-    tnw::Light l = tnw::Light(1.0,0.0,0.0);
+    tnw::Light l = tnw::Light(0.0,0.0,4.0);
     l.setKs(0,0,0);
     l.setKd(1,1,1);
     luzes.append(l);
-    lastMouse[0] = 0;
-    lastMouse[1] = 0;
+    lastMouseRot[0] = 0;
+    lastMouseRot[1] = 0;
+    lastMouseMov[0] = 0;
+    lastMouseMov[1] = 0;
     angles[0] = 0;
     angles[1] = 0;
+    moveSelectedPointInDir[0] = false;
+    moveSelectedPointInDir[1] = true;
 
     time.start(60);
 }
@@ -64,6 +59,7 @@ void GLWidget::paintGL()
     float amb[3] = {0.2,0.2,0.2};
     if (createdModel) {
         this->model->getModel()->desenhar(amb, this->luzes);
+        //this->model->getModel()->desenhar();
         if (showGridOpt){
             this->model->getGrid()->draw(1);
         }
@@ -78,17 +74,23 @@ void GLWidget::update()
 void GLWidget::openModel()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Model"), "", tr("*.obj files with a *.mtl file"));
-    QVector4D p(0,0,0,1);
-    QVector4D S(1.5,0,0,0);
-    QVector4D T(0,1.5,0,0);
-    QVector4D U(0,0,1.5,0);
-    this->model = new GridModel(fileName, p, S, T, U, 5, 5, 5);
-    //this->model = new GridModel(fileName, 5, 5, 5);
-    //tnw::TransformMatrix m = tnw::escala(0.3,0.3,0.3);
-    //tnw::TransformMatrix t = tnw::translacao(-this->model->getModel()->getPontoMedio());
-    //this->model->getModel()->aplicarTransformacao(m*t);
-    //this->model->getGrid()->applyTransform(m);
+//    QVector4D p(0,0,0,1);
+//    QVector4D S(1.5,0,0,0);
+//    QVector4D T(0,1.5,0,0);
+//    QVector4D U(0,0,1.5,0);
+
     createdModel = true;
+
+    QVector4D p(2,0,2,1);
+    QVector4D S(-2,0,0,0);
+    QVector4D T(0,2,0,0);
+    QVector4D U(0,0,-2,0);
+    this->model = new GridModel(fileName, p, S, T, U, 8, 8, 8);
+    //this->model = new GridModel("cube.obj", p, S, T, U, 1, 1, 1);
+    std::cout << "=======vertice 1========\n";
+    QList<QVector4D> l = this->model->getModel()->getVertices();
+    std::cout << l[0].x() << "|" << l[0].y() << "|" << l[0].z() << "|" << l[0].w() << "\n";
+    flush(cout);
 }
 
 void GLWidget::changeNumGridPoints(int ns, int nt, int nu)
@@ -155,7 +157,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event){
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event){
     if (rbpress) {
-        float deltaX = (event->pos().x() - lastMouse[0]) / this->width() ;
+        float deltaX = (event->pos().x() - lastMouseRot[0]) / this->width() ;
         angles[0] += deltaX;
         //cout << "deltaX: " << deltaX << " e angles: " << angles[0] << "\n";
 //        if (angles[0] >= 360) {
@@ -170,9 +172,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event){
 
         model->getModel()->aplicarTransformacao(tmfX*rX*tmiX);
         model->getGrid()->applyTransform(tgfX*rX*tgiX);
-        lastMouse[0] = event->pos().x();
+        lastMouseRot[0] = event->pos().x();
 
-        float deltaY = (lastMouse[1] - event->pos().y()) / this->height();
+        float deltaY = (lastMouseRot[1] - event->pos().y()) / this->height();
         angles[1] += deltaY;
         //cout << "deltaY: " << deltaY << " e angles: " << angles[1] << "\n";
 //        if (angles[1] >= 360){
@@ -186,10 +188,70 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event){
 
         model->getModel()->aplicarTransformacao(tmfY*rY*tmiY);
         model->getGrid()->applyTransform(tgfY*rY*tgiY);
-        lastMouse[1] = event->pos().y();
+        lastMouseRot[1] = event->pos().y();
     }
     if (lbpress){
-        //Aqui vai o código de mover o ponto
+//        cout << "left button pressed!\n";
+//        flush(cout);
+//        //Aqui vai o código de mover o ponto
+//        float deltaDir = (lastMouseMov[0] - event->pos().x()) / this->width();
+//        cout << "deltaDir: " << deltaDir << "\n";
+//        flush(cout);
+//        lastMouseMov[0] = event->pos().x();
+//        QVector3D selPoint = this->model->getGrid()->getSelectedPoint();
+//        //Se o ponto selecionado do grid é válido
+//        if (selPoint.x() >= 0 && selPoint.y() >= 0 && selPoint.z() >= 0 ){
+//            QVector4D pointBefore = this->model->getGrid()->getPoints().get(selPoint.x(), selPoint.y(), selPoint.z());
+//            if (moveSelectedPointInDir[0]) {
+//                pointBefore.setX(pointBefore.x() + deltaDir);
+//            } else if (moveSelectedPointInDir[1]) {
+//                pointBefore.setY(pointBefore.y() + deltaDir);
+//            } else if (moveSelectedPointInDir[2]) {
+//                pointBefore.setZ(pointBefore.z() + deltaDir);
+//            }
+
+//            this->model->getGrid()->getPoints().set(selPoint.x(), selPoint.y(), selPoint.z(), pointBefore);
+//            this->model->deformModel();
+//        }
+    }
+}
+
+void GLWidget::keyPressEvent(QKeyEvent *event)
+{
+//    cout << "key press: " << event->key() << "\n";
+//    flush(cout);
+    if (event->key() ==  Qt::Key_X) {
+        //cout << "x key pressed!\n";
+        moveSelectedPointInDir[0] = true;
+        moveSelectedPointInDir[1] = false;
+        moveSelectedPointInDir[2] = false;
+    } else if (event->key() == Qt::Key_Y) {
+        //cout << "y key pressed\n";
+        moveSelectedPointInDir[0] = false;
+        moveSelectedPointInDir[1] = true;
+        moveSelectedPointInDir[2] = false;
+    } else if (event->key() == Qt::Key_Z){
+        //cout << "z key pressed\n";
+        moveSelectedPointInDir[0] = false;
+        moveSelectedPointInDir[1] = false;
+        moveSelectedPointInDir[2] = true;
+    } else if (event->key() == Qt::Key_Left) {
+        QVector3D selPoint = this->model->getGrid()->getSelectedPoint();
+        //Se o ponto selecionado do grid é válido
+        if (selPoint.x() >= 0 && selPoint.y() >= 0 && selPoint.z() >= 0 ){
+            QVector4D pointBefore = this->model->getGrid()->getPoints().get(selPoint.x(), selPoint.y(), selPoint.z());
+            pointBefore.setX(pointBefore.x() - 0.1);
+            this->model->moveGridPoint(selPoint.x(), selPoint.y(), selPoint.z(), pointBefore);
+            cout << "deformed model!\n";
+            flush(cout);
+        }
+    } else if (event->key() == Qt::Key_Right) {
+        QVector3D selPoint = this->model->getGrid()->getSelectedPoint();
+        if (selPoint.x() >= 0 && selPoint.y() >= 0 && selPoint.z() >= 0 ){
+             QVector4D pointBefore = this->model->getGrid()->getPoints().get(selPoint.x(), selPoint.y(), selPoint.z());
+             pointBefore.setX(pointBefore.x() + 0.1);
+             this->model->moveGridPoint(selPoint.x(), selPoint.y(), selPoint.z(), pointBefore);
+        }
     }
 }
 

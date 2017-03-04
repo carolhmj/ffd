@@ -19,7 +19,8 @@ public:
     ~GLWidget();
 protected:
     QTimer time;
-    float lastMouse[2];
+    float lastMouseRot[2];
+    float lastMouseMov[2];
     float angles[2];
     bool lbpress;
     bool rbpress;
@@ -27,6 +28,7 @@ protected:
     GridModel *model;
     bool createdModel;
     QList<tnw::Light> luzes;
+    bool moveSelectedPointInDir[3];
 
     void initializeGL();
     void resizeGL(int w, int h);
@@ -34,6 +36,7 @@ protected:
     void mousePressEvent(QMouseEvent*);
     void mouseReleaseEvent(QMouseEvent*);
     void mouseMoveEvent(QMouseEvent*);
+    void keyPressEvent(QKeyEvent *);
 signals:
     void displayPoints(std::vector<QVector4D> points);
 public slots:

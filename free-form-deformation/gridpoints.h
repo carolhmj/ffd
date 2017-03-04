@@ -22,7 +22,7 @@ public:
     QVector4D& operator()(int i, int j, int k);
     QVector4D operator()(int i, int j, int k) const;
     int dataSize() const;
-    std::vector<QVector4D> getData() const;
+    std::vector<QVector4D> getData();
 };
 
 #endif // GRIDPOINTS_H

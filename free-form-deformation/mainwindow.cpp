@@ -25,8 +25,6 @@ void MainWindow::changeNumGridPoints(int nNum)
 
 void MainWindow::selectedPointTextInput(QString text)
 {
-    cout << text.toStdString() << "\n";
-    flush(cout);
     char *textCon, *token;
     textCon = (char*) malloc(sizeof(char)*(text.size()+1));
     strcpy(textCon, text.toStdString().c_str());
@@ -35,11 +33,14 @@ void MainWindow::selectedPointTextInput(QString text)
 
     token = strtok(textCon, " ");
     while (token != NULL && i < 3) {
-        cout << "atoi " << atoi(token) << "\n";
         point[i] = atoi(token);
         i++;
         token = strtok(NULL, " ");
     }
-
-    ui->glWidget->selectGridPoint(point);
+    if (i == 3) {
+        ui->pointSelector->clearFocus();
+        ui->glWidget->setFocus();
+        //this->setFocus();
+        ui->glWidget->selectGridPoint(point);
+    }
 }

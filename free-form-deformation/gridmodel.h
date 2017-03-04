@@ -3,6 +3,7 @@
 
 #include <QVector4D>
 #include <QVector3D>
+#include <QList>
 #include <QString>
 #include <vector>
 #include "model.h"
@@ -26,9 +27,12 @@ public:
     void substituteGrid(FFDGrid *grid);
     void deformModel();
     QVector4D bezierHelper(float s, float t, float u);
+    double bernsteinHelper(int u, int v, float s);
+    QVector4D deformPoint(float s, float t, float u);
     long long combiHelper(int n, int k);
-    tnw::Model *getModel() const;
-    FFDGrid *getGrid() const;
+    tnw::Model *getModel();
+    FFDGrid *getGrid();
+    void moveGridPoint(int i, int j, int k, QVector4D p);
 };
 
 #endif // GRIDMODEL_H

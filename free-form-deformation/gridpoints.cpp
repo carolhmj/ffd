@@ -1,7 +1,7 @@
 #include "gridpoints.h"
 
 
-std::vector<QVector4D> GridPoints::getData() const
+std::vector<QVector4D> GridPoints::getData()
 {
     return _data;
 }
@@ -21,17 +21,17 @@ GridPoints::~GridPoints()
 
 void GridPoints::set(int i, int j, int k, QVector4D p)
 {
-    this->_data.at(i * j*this->ni + k*this->ni*this->nj) = p;
+    this->_data.at(i + j*this->ni + k*this->ni*this->nj) = p;
 }
 
 QVector4D GridPoints::get(int i, int j, int k)
 {
-    return this->_data.at(i * j*this->ni + k*this->ni*this->nj);
+    return this->_data.at(i + j*this->ni + k*this->ni*this->nj);
 }
 
 QVector4D GridPoints::operator()(int i, int j, int k) const
 {
-    return this->_data.at(i * j*this->ni + k*this->ni*this->nj);
+    return this->_data.at(i + j*this->ni + k*this->ni*this->nj);
 }
 
 int GridPoints::dataSize() const

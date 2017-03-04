@@ -10,15 +10,23 @@ using namespace std;
  * partindo do menor para o maior ponto do modelo
  */
 
-tnw::Model *GridModel::getModel() const
+tnw::Model *GridModel::getModel()
 {
     return model;
 }
 
-FFDGrid *GridModel::getGrid() const
+FFDGrid *GridModel::getGrid()
 {
     return grid;
 }
+
+//Move um ponto do grid
+void GridModel::moveGridPoint(int i, int j, int k, QVector4D p)
+{
+    this->grid->moveGridPoint(i,j,k,p);
+    deformModel();
+}
+
 GridModel::GridModel(QString modelName, int ns, int nt, int nu)
 {
     this->model = new tnw::Model(modelName);
@@ -83,6 +91,7 @@ void GridModel::calcLocalModelVertices()
     QVector3D Tn = this->grid->getT().toVector3D();
     QVector3D Un = this->grid->getU().toVector3D();
     auto vertices = this->model->getVertices();
+    cout << "=====local coords=======\n";
     for (int i = 0; i < vertices.size(); i++){
         QVector4D coord;
         coord.setX( formulaHelper(Tn,Un,Sn,vertices[i].toVector3D(),pn) );
@@ -91,6 +100,7 @@ void GridModel::calcLocalModelVertices()
         coord.setW( 1 );
         this->modelVerticesLocal.push_back(coord);
     }
+    cout << this->modelVerticesLocal[0].x() << " " << this->modelVerticesLocal[0].y() << " " << this->modelVerticesLocal[0].z() << "\n";
 }
 
 /* Função para calcular um termo da fórmula do livro computer animation,
@@ -98,8 +108,16 @@ void GridModel::calcLocalModelVertices()
  */
 float GridModel::formulaHelper(QVector3D v1, QVector3D v2, QVector3D v3, QVector3D p, QVector3D p0)
 {
-    //QVector3D::dotProduct( QVector3D::crossProduct(v1,v2), (p - p0) / QVector3D::dotProduct(QVector3D::crossProduct(v1,v2),v3));
-    return QVector3D::dotProduct(QVector3D::crossProduct(v1,v2), p - p0) / QVector3D::dotProduct(QVector3D::crossProduct(v1,v2), v3);
+    //cout << "p: " << p.x() << "|" << p.y() << "|" << p.z() << " p0: " << p0.x() << "|" << p0.y() << "|" << p0.z() << "\n";
+    QVector3D crossProd1 = QVector3D::crossProduct(v1,v2);
+    QVector3D pointDif = p - p0;
+    float dotProduct1 = QVector3D::dotProduct(crossProd1,pointDif);
+    float dotProduct2 = QVector3D::dotProduct(crossProd1, v3);
+    float quot = dotProduct1 / dotProduct2 ;
+    //cout << "crossProd1: " << crossProd1.x() << "|" << crossProd1.y() << "|" << crossProd1.z() << " pointDif: " << pointDif.x() << "|" << pointDif.y() << "|" << pointDif.z() << " dotProduct1: " << dotProduct1 << " dotProduct2: " << " quot: " << quot << "\n";
+    flush(cout);
+    return quot;
+    //return QVector3D::dotProduct(QVector3D::crossProduct(v1,v2), (p - p0)) / QVector3D::dotProduct(QVector3D::crossProduct(v1,v2), v3);
 }
 
 //Substitui o grid por outro, recalcula as coordenadas locais
@@ -119,11 +137,17 @@ void GridModel::deformModel()
     if (model == NULL || grid == NULL) {
         return;
     }
-    auto modelVertices = model->getVertices();
+    QList<tnw::Vertice> modelVertices = model->getVertices();
     for (int m = 0; m < modelVertices.size(); m++){
         QVector4D localCoords = modelVerticesLocal[m];
         modelVertices[m] = bezierHelper(localCoords.x(), localCoords.y(), localCoords.z());
     }
+    model->setVertices(modelVertices);
+    cout << "==========deformed vertices======\n";
+//    for (int i = 0; i < model->getVertices().size(); i++){
+//        cout << model->getVertices()[i].x() << " " << model->getVertices()[i].y() << " " << model->getVertices()[i].z() << "\n";
+//    }
+    cout << model->getVertices()[0].x() << " " << model->getVertices()[0].y() << " " << model->getVertices()[0].z() << "\n";
 }
 
 QVector4D GridModel::bezierHelper(float s, float t, float u)
@@ -138,7 +162,19 @@ QVector4D GridModel::bezierHelper(float s, float t, float u)
         }
     }
     //Considerando que os pontos do grid são multiplicados várias vezes, acho que é necessário
+
+//    acum.setX(acum.x()/acum.w());
+//    acum.setY(acum.y()/acum.w());
+//    acum.setZ(acum.z()/acum.w());
     acum.setW(1);
+    return acum;
+}
+
+double GridModel::bernsteinHelper(int u, int v, float s)
+{
+    double binomial = combiHelper(v, u);
+    return binomial * std::pow(s, u) * std::pow((1-s),(double)(v-u));
+
 }
 
 /* Código que computa coeficientes binomiais. Encontrei em:

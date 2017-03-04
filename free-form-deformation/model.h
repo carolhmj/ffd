@@ -37,6 +37,7 @@ namespace tnw {
         //Métodos
         void desenhar(float ambiente[3],QList<tnw::Light> luzes);
         void desenhar(TransformMatrix m,float ambiente[3],QList<tnw::Light> luzes);
+        void desenhar();
         void aplicarTransformacao(TransformMatrix m); // Aplica a transformação no modelo inteiro
         void aplicarTransformacao(TransformMatrix m,int i); // Aplica a transformação no i-ésimo grupo do modelo.
         // Get and Setters
@@ -48,7 +49,8 @@ namespace tnw {
         // Construtores
         Model(QString pathname); // Construtor que recebe um arquivo OBJ.
         Model(QList<Vertice> vertices,QList<Face> faces); // Construtor que recebe uma lista de vertices e faces.
-	};
+        void setVertices(const QList<Vertice> &value);
+    };
 
 }
 #endif
